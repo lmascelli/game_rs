@@ -38,7 +38,7 @@ struct PropertyAttribute {
 }
 
 impl LevelBuilder {
-    const ASSETS_FOLDER: &str = "assets";
+    const ASSETS_FOLDER: &str = "./assets";
     const DEFAULT_TILE_SIZE: f32 = 32.0;
 
     pub fn load_from_tmx_buffer<T: AsRef<std::path::Path>>(

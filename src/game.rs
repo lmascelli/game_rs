@@ -76,7 +76,9 @@ impl Game {
     fn logic(&mut self) {}
 
     fn render(&mut self) {
-        self.renderer.as_mut().unwrap().render();
+        if let Some(renderer) = self.renderer.as_mut() {
+            renderer.render();
+        }
     }
 }
 
@@ -117,6 +119,7 @@ impl winit::application::ApplicationHandler<GameEvent> for Game {
         }
         match event {
             WindowEvent::CloseRequested => {
+                self.renderer.take();
                 event_loop.exit();
             }
             WindowEvent::RedrawRequested => {
@@ -125,7 +128,7 @@ impl winit::application::ApplicationHandler<GameEvent> for Game {
             _ => {}
         }
     }
-
+    
     fn user_event(&mut self, _event_loop: &winit::event_loop::ActiveEventLoop, event: GameEvent) {
         match event {
             GameEvent::Tick => {
