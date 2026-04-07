@@ -4,9 +4,17 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+configini = { path = "./configini" }
 winit = "*"
 wgpu = "*"
 pollster = "*"
 bytemuck = "*"
 image = { version = "*", features = [ "default-formats" ] }
 xml = "*"
+
+[profile.dev]
+opt-level = 0
+debug = 2
+debug-assertions = true
+strip = "none"
+split-debuginfo = "unpacked"

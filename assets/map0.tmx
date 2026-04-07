@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="128" tileheight="128" infinite="0" nextlayerid="3" nextobjectid="4">
  <tileset firstgid="1" name="tileset0" tilewidth="128" tileheight="128" tilecount="3" columns="3">
-  <image source="../../basic_game/assets/RedSquare.png" width="384" height="128"/>
+  <image source="RedSquare.png" width="384" height="128"/>
  </tileset>
  <tileset firstgid="4" name="knight" tilewidth="32" tileheight="32" tilecount="3" columns="3">
-  <image source="../../basic_game/assets/Knight.png" width="96" height="32"/>
+  <image source="Knight.png" width="96" height="32"/>
  </tileset>
  <layer id="1" name="background" width="30" height="20">
   <properties>
-   <property name="tile_size" type="int" value="32"/>
+    <!-- <property name="tile_size" type="int" value="32"/> -->
   </properties>
   <data encoding="csv">
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,

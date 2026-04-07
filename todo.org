@@ -4,12 +4,12 @@
 
 * TODOS
 ** DONE Layer tile size
-The tiles of each layer must have the same size. However it is not expected
-that each tile must be part of the same tileset and different tilesets may have
-different tile sizes. For this reason a way to estabilish a common size for
-each tile have to be estabilished. One idea is to provide it in the map
-definition as a property of the layer and parse it during the import of the
-map. In this case if the property is absent or invalid a default one must be
-provided or the application shall panic. In case of the former how to decide
-what is the default value for the size of the tiles of each layer? Maybe during
-the costruction of the Game object?
+The tiles of each layer must have the same size. However it is not expected that each tile must be part of the same tileset and
+different tilesets may have different tile sizes. For this reason a way to estabilish a common size for each tile have to be
+estabilished. One idea is to provide it in the map definition as a property of the layer and parse it during the import of the
+map. In this case if the property is absent or invalid a default one must be provided or the application shall panic. In case of
+the former how to decide what is the default value for the size of the tiles of each layer? Maybe during the costruction of the
+Game object? It seams some form of configuration file is needed.
+
+** Configuration file
+

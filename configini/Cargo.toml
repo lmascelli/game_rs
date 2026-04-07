@@ -1,0 +1,8 @@
+[package]
+name = "configini"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rust-ini = "*"
+configini-derive = { path = "./configini_derive" }

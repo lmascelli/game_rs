@@ -1,0 +1,14 @@
+[package]
+name = "configini-derive"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "configini_derive"
+path = "src/lib.rs"
+proc-macro = true
+
+[dependencies]
+syn = "*"
+quote = "*"
+proc-macro2 = "*"

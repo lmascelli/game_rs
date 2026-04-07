@@ -1,3 +1,5 @@
+#[path = "./config.rs"]
+mod config;
 #[path = "./error.rs"]
 mod error;
 #[path = "./level.rs"]
@@ -5,6 +7,7 @@ mod level;
 #[path = "./renderer.rs"]
 mod renderer;
 
+pub use config::{AppConfig, AppConfigManager};
 pub use error::GameError;
 pub use level::{Level, LevelBuilder};
 pub use renderer::Renderer;
@@ -20,25 +23,29 @@ pub struct Game {
     renderer: Option<Renderer>,
     current_level_builder: Option<LevelBuilder>,
     current_level: Option<Level>,
+    config: AppConfigManager,
 }
 
 impl Game {
     pub fn create(
         title: &str,
-        width: u32,
-        height: u32,
+        config: AppConfigManager,
         starting_level_path: &str,
     ) -> Result<Self, GameError> {
         Ok(Self {
             window: None,
             renderer: None,
             title: title.to_string(),
-            size: winit::dpi::PhysicalSize { width, height },
+            size: winit::dpi::PhysicalSize {
+                width: config.window_width(),
+                height: config.window_height(),
+            },
             current_level_builder: Some(
                 LevelBuilder::load_from_tmx_buffer(starting_level_path)
                     .expect("Failed to parse the level"),
             ),
             current_level: None,
+            config,
         })
     }
 
@@ -76,7 +83,9 @@ impl Game {
     fn logic(&mut self) {}
 
     fn render(&mut self) {
-        self.renderer.as_mut().unwrap().render();
+        if let Some(renderer) = self.renderer.as_mut() {
+            renderer.render();
+        }
     }
 }
 
@@ -95,6 +104,7 @@ impl winit::application::ApplicationHandler<GameEvent> for Game {
             if self.renderer.is_none() {
                 self.renderer.replace(pollster::block_on(Renderer::new(
                     &self.window.as_ref().unwrap(),
+                    &self.config,
                 )));
                 if let Some(_) = self.current_level_builder {
                     let level_builder = self.current_level_builder.take().unwrap();
@@ -117,6 +127,7 @@ impl winit::application::ApplicationHandler<GameEvent> for Game {
         }
         match event {
             WindowEvent::CloseRequested => {
+                self.renderer.take();
                 event_loop.exit();
             }
             WindowEvent::RedrawRequested => {

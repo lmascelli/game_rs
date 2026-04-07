@@ -11,11 +11,15 @@ pub struct Renderer {
 impl Renderer {
     const SHADERS_FOLDER: &str = "shaders";
 
-    pub async fn new(window: &winit::window::Window) -> Self {
-        let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
+    pub async fn new(window: &winit::window::Window, config: &crate::game::AppConfigManager) -> Self {
+        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
             backends: wgpu::Backends::PRIMARY,
             flags: wgpu::InstanceFlags::DEBUG | wgpu::InstanceFlags::VALIDATION,
-            ..Default::default()
+            memory_budget_thresholds: wgpu::MemoryBudgetThresholds::default(),
+            backend_options: wgpu::BackendOptions::default(),
+            display: Some(Box::new(unsafe {
+                &*(window as *const winit::window::Window)
+            })),
         });
 
         let surface = instance
@@ -106,10 +110,26 @@ impl Renderer {
     }
 
     pub fn render(&mut self) {
-        let current_texture = self
-            .surface
-            .get_current_texture()
-            .expect("[ERROR]: Failed to get the current texture");
+        let current_texture = match self.surface.get_current_texture() {
+            wgpu::CurrentSurfaceTexture::Success(texture) => texture,
+            wgpu::CurrentSurfaceTexture::Suboptimal(texture) => {
+                self.surface.configure(&self.device, &self.configuration);
+                if let wgpu::CurrentSurfaceTexture::Success(texture) =
+                    self.surface.get_current_texture()
+                {
+                    texture
+                } else {
+                    panic!(
+                        "[ERROR] Two consecutive configuration of surface failed during rendering"
+                    );
+                }
+            }
+            _ => {
+                panic!(
+                    "[ERROR] Failed to get the current texture from the surface during rendering"
+                );
+            }
+        };
 
         let view = current_texture
             .texture
