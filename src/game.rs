@@ -136,7 +136,7 @@ impl winit::application::ApplicationHandler<GameEvent> for Game {
             _ => {}
         }
     }
-
+    
     fn user_event(&mut self, _event_loop: &winit::event_loop::ActiveEventLoop, event: GameEvent) {
         match event {
             GameEvent::Tick => {
