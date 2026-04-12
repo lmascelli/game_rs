@@ -18,7 +18,7 @@ enum GameEvent {
 
 pub struct Game {
     window: Option<winit::window::Window>,
-    size: winit::dpi::PhysicalSize<u32>,
+    pub size: winit::dpi::PhysicalSize<u32>,
     title: String,
     renderer: Option<Renderer>,
     current_level_builder: Option<LevelBuilder>,
@@ -47,6 +47,10 @@ impl Game {
             current_level: None,
             config,
         })
+    }
+
+    pub fn get_renderer(&mut self) -> &mut Renderer {
+        self.renderer.as_mut().expect("[ERROR] Asked for renderer but it's not present")
     }
 
     pub fn run(&mut self) -> Result<(), GameError> {
@@ -83,8 +87,9 @@ impl Game {
     fn logic(&mut self) {}
 
     fn render(&mut self) {
-        if let Some(renderer) = self.renderer.as_mut() {
-            renderer.render();
+        if let Some(renderer) = self.renderer.as_mut()
+        && let Some(level) = self.current_level.as_ref() {
+            renderer.render(level);
         }
     }
 }
@@ -109,7 +114,7 @@ impl winit::application::ApplicationHandler<GameEvent> for Game {
                 if let Some(_) = self.current_level_builder {
                     let level_builder = self.current_level_builder.take().unwrap();
                     self.current_level
-                        .replace(level_builder.build(self.renderer.as_mut().unwrap()));
+                        .replace(level_builder.build(self as _));
                 }
             }
         }

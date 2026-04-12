@@ -1,3 +1,31 @@
+/// # Tile
+///
+/// At the moment a tile is simply something to be drawed. Maybe later it will have
+/// some properties (wall, door, walkable or not). So it only has to know what id it
+/// has and how it can be drawed. My idea is that all tiles will have the same size
+/// fixed and defined as map level configuration so the only information needed to
+/// render them is the view on the texture that contains their image. For this
+/// reason the only way to generate a tile is from the tileset that contains its
+/// image so that it can be constructed with a view in the tileset texture and
+/// with the render pipeline already set up.
+#[derive(Debug)]
+pub struct Tile {
+    id: u32,
+    render_pipeline: wgpu::RenderPipeline,
+    texture_view: wgpu::TextureView,
+}
+
+impl Tile {}
+
+/// # Tileset
+///
+/// A tileset is a big image that contains the content of the tiles. This leads to
+/// a single texture stored once in memory. A tile will be a view on a part of this
+/// texture so that drawing a tile means drawing a square (two triangles) attaching
+/// the texture view on it in the fragment shader.  
+/// Because the tiles are identified by an unique id and there may be more than one
+/// tileset, each tileset should be able to tell if an id is part of their image,
+/// returning `None` if not or a valid `Tile` if so.
 #[derive(Debug)]
 pub struct Tileset {
     pub name: String,
@@ -71,10 +99,8 @@ impl TilesetBuilder {
             texture,
         }
     }
-}
 
-pub struct Tile {
-    texture_view: wgpu::TextureView,
+    pub fn get_tile(&self, tile_id: u32) -> Option<Tile> {
+        todo!()
+    }
 }
-
-impl Tile {}

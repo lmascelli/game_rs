@@ -8,6 +8,10 @@ pub struct Renderer {
     pub shaders: HashMap<String, wgpu::ShaderModule>,
 }
 
+/// # Renderer
+///
+/// Owner of the renderer resources.
+///
 impl Renderer {
     const SHADERS_FOLDER: &str = "shaders";
 
@@ -109,7 +113,10 @@ impl Renderer {
         }
     }
 
-    pub fn render(&mut self) {
+    pub fn render(
+        &mut self,
+        level: &crate::game::Level,
+    ) {
         let current_texture = match self.surface.get_current_texture() {
             wgpu::CurrentSurfaceTexture::Success(texture) => texture,
             wgpu::CurrentSurfaceTexture::Suboptimal(texture) => {
@@ -125,9 +132,9 @@ impl Renderer {
                 }
             }
             _ => {
-                panic!(
-                    "[ERROR] Failed to get the current texture from the surface during rendering"
-                );
+                // Probably lost a frame for some reason. I've noticed it happens after waking the
+                // pc from a sleep. Just skip this render call.
+                return;
             }
         };
 
@@ -166,6 +173,7 @@ impl Renderer {
             });
         }
 
+        level.render();
         self.queue.submit([command_encoder.finish()]);
         current_texture.present();
     }

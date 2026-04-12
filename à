@@ -31,7 +31,7 @@ pub struct Level {
 // so it will somehow ensured that derefering this pointer will produce a valid
 // address
 macro_rules! game_as_mut {
-    ($g:expr) => { unsafe { &mut *($g as *mut Game) } }
+    ($g:ident) => { unsafe { &mut *($g as *mut Game) } }
 }
 // SAFETY This is more uncertain. It makes possible to borrow two times the game
 // instance as mutable fucking up with Rust rules, i know. It's a workaround to
@@ -44,15 +44,9 @@ macro_rules! game_as_ref {
 }
 
 impl Level {
-    pub fn render(&self) {
+    pub fn render(&self, renderer: &mut crate::game::Renderer) {
         let mut camera_render_data = CameraRenderData::default();
-        camera_render_data.window_size.0 = game_as_ref!(self.game).size.width as f32;
-        camera_render_data.window_size.1 = game_as_ref!(self.game).size.height as f32;
-        for layer in &self.layers {
-            camera_render_data.layers.push(layer);
-        }
-
-        self.camera.render(game_as_mut!(self.game).get_renderer(), camera_render_data);
+        camera_render_data.window_size.0 = game_as_ref!(self.game).size.x;
     }
 }
 

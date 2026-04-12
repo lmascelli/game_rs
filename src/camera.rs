@@ -3,21 +3,21 @@
 /// tiles inside its boundaries.
 #[derive(Default, Debug)]
 pub struct Camera {
-    x: f32,
-    y: f32,
+    pub x: f32,
+    pub y: f32,
 }
 
 /// CameraRenderData is an helper struct used to pass parameters to the render
 /// function of Camera without passing lots to parameters to it.
 #[derive(Default)]
 pub struct CameraRenderData<'level> {
-    layers: Vec<&'level crate::game::level::layer::Layer>,
-    window_size: (f32, f32),
+    pub layers: Vec<&'level crate::game::level::layer::Layer>,
+    pub window_size: (f32, f32),
 }
 
 impl Camera {
     pub fn render(
-        &mut self,
+        &self,
         renderer: &mut crate::game::renderer::Renderer,
         camera_render_data: CameraRenderData,
     ) {
