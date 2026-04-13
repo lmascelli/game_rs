@@ -6,18 +6,13 @@ mod layer;
 mod tileset;
 
 use crate::game::{error, Game, GameError};
+use crate::game::renderer::Renderer;
 use layer::Layer;
 use std::str::FromStr;
 use tileset::{Tileset, TilesetBuilder};
 use camera::{Camera, CameraRenderData};
 
 pub struct Level {
-    // I need a reference to the parent Game class. The game itself does only
-    // reads major property of the Game, like the window size, for renderering
-    // the tiles with the Camera in the correct position. I've made it a pointer
-    // instead of a Rust reference because i still can't figure out how to do it
-    // respecting the lifetimes rules
-    game: *const Game,
     width: u32,
     height: u32,
     tilewidth: u32,
@@ -27,32 +22,16 @@ pub struct Level {
     camera: Camera,
 }
 
-// SAFETY Game is the top level class respect to where this macro can be called
-// so it will somehow ensured that derefering this pointer will produce a valid
-// address
-macro_rules! game_as_mut {
-    ($g:expr) => { unsafe { &mut *($g as *mut Game) } }
-}
-// SAFETY This is more uncertain. It makes possible to borrow two times the game
-// instance as mutable fucking up with Rust rules, i know. It's a workaround to
-// avoid any interior mutability construct as the Game instance can't be cloned
-// or copied because it holds the threads of the window event loop but there will
-// be for sure the need of different inner objects of it to modify other parts.
-// PAY ATTENTION as this can be a spot for bugs!!!
-macro_rules! game_as_ref {
-    ($g:expr) => { unsafe { & *($g as *mut Game) } }
-}
-
 impl Level {
-    pub fn render(&self) {
+    pub fn render(&self, renderer: &mut Renderer, winsize: winit::dpi::PhysicalSize<u32>) {
         let mut camera_render_data = CameraRenderData::default();
-        camera_render_data.window_size.0 = game_as_ref!(self.game).size.width as f32;
-        camera_render_data.window_size.1 = game_as_ref!(self.game).size.height as f32;
+        camera_render_data.window_size.0 = winsize.width as f32;
+        camera_render_data.window_size.1 = winsize.height as f32;
         for layer in &self.layers {
             camera_render_data.layers.push(layer);
         }
 
-        self.camera.render(game_as_mut!(self.game).get_renderer(), camera_render_data);
+        self.camera.render(renderer, camera_render_data);
     }
 }
 
@@ -335,10 +314,9 @@ impl LevelBuilder {
         Ok(ret)
     }
 
-    pub fn build(mut self, game: *const Game) -> Level {
+    pub fn build(mut self, renderer: &mut Renderer) -> Level {
         self.layers.sort_by(|l1, l2| l1.order.cmp(&l2.order));
         Level {
-            game,
             width: self.width,
             height: self.height,
             tilewidth: self.tilewidth,
@@ -346,7 +324,7 @@ impl LevelBuilder {
             tilesets: self
                 .tileset_builders
                 .into_iter()
-                .map(|b| b.build(game_as_mut!(game).get_renderer()))
+                .map(|b| b.build(renderer))
                 .collect(),
             layers: self.layers,
             camera: Camera {

@@ -49,10 +49,6 @@ impl Game {
         })
     }
 
-    pub fn get_renderer(&mut self) -> &mut Renderer {
-        self.renderer.as_mut().expect("[ERROR] Asked for renderer but it's not present")
-    }
-
     pub fn run(&mut self) -> Result<(), GameError> {
         let event_loop = match winit::event_loop::EventLoop::<GameEvent>::with_user_event().build()
         {
@@ -89,7 +85,7 @@ impl Game {
     fn render(&mut self) {
         if let Some(renderer) = self.renderer.as_mut()
         && let Some(level) = self.current_level.as_ref() {
-            renderer.render(level);
+            renderer.render(self.size, level);
         }
     }
 }
@@ -114,7 +110,7 @@ impl winit::application::ApplicationHandler<GameEvent> for Game {
                 if let Some(_) = self.current_level_builder {
                     let level_builder = self.current_level_builder.take().unwrap();
                     self.current_level
-                        .replace(level_builder.build(self as _));
+                        .replace(level_builder.build(self.renderer.as_mut().unwrap()));
                 }
             }
         }

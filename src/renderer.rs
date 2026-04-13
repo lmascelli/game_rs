@@ -115,6 +115,7 @@ impl Renderer {
 
     pub fn render(
         &mut self,
+        winsize: winit::dpi::PhysicalSize<u32>,
         level: &crate::game::Level,
     ) {
         let current_texture = match self.surface.get_current_texture() {
@@ -173,7 +174,7 @@ impl Renderer {
             });
         }
 
-        level.render();
+        level.render(self, winsize);
         self.queue.submit([command_encoder.finish()]);
         current_texture.present();
     }
