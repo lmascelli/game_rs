@@ -1,7 +1,6 @@
 use configini::Configini;
 
-#[derive(Debug, Clone)]
-#[derive(Configini)]
+#[derive(Debug, Clone, Configini)]
 pub struct AppConfig {
     pub window_width: u32,
     pub window_height: u32,
@@ -9,7 +8,6 @@ pub struct AppConfig {
     pub default_tile_height: u32,
     pub with_dgpu: bool,
 }
-
 
 impl Default for AppConfig {
     fn default() -> Self {

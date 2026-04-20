@@ -15,7 +15,10 @@ pub struct Renderer {
 impl Renderer {
     const SHADERS_FOLDER: &str = "shaders";
 
-    pub async fn new(window: &winit::window::Window, config: &crate::game::AppConfigManager) -> Self {
+    pub async fn new(
+        window: &winit::window::Window,
+        config: &crate::game::AppConfigManager,
+    ) -> Self {
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
             backends: wgpu::Backends::PRIMARY,
             flags: wgpu::InstanceFlags::DEBUG | wgpu::InstanceFlags::VALIDATION,
@@ -61,21 +64,20 @@ impl Renderer {
                         .expect("[ERROR]: Failed to open shader file")
                         .read_to_string(&mut shader_source)
                         .expect("[ERROR]: Failed to read the shader into memory");
+                    let shader_name = dir_entry
+                        .path()
+                        .as_path()
+                        .file_prefix()
+                        .expect("[ERROR]: Failed to get the prefix of the shader path")
+                        .to_str()
+                        .expect("[ERROR]: Failed to get the shader file_name str")
+                        .to_string();
                     let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
-                        label: Some(
-                            dir_entry
-                                .file_name()
-                                .to_str()
-                                .expect("[ERROR]: Failed to get the shader file_name str"),
-                        ),
+                        label: Some(&shader_name),
                         source: wgpu::ShaderSource::Wgsl(std::borrow::Cow::from(shader_source)),
                     });
                     shaders.insert(
-                        dir_entry
-                            .path()
-                            .to_str()
-                            .expect("[ERROR]: failed to convert shader entry path")
-                            .to_string(),
+                        shader_name,
                         shader,
                     );
                 }
@@ -113,11 +115,7 @@ impl Renderer {
         }
     }
 
-    pub fn render(
-        &mut self,
-        winsize: winit::dpi::PhysicalSize<u32>,
-        level: &crate::game::Level,
-    ) {
+    pub fn render(&mut self, winsize: winit::dpi::PhysicalSize<u32>, level: &crate::game::Level) {
         let current_texture = match self.surface.get_current_texture() {
             wgpu::CurrentSurfaceTexture::Success(texture) => texture,
             wgpu::CurrentSurfaceTexture::Suboptimal(texture) => {

@@ -18,7 +18,7 @@ enum GameEvent {
 
 pub struct Game {
     window: Option<winit::window::Window>,
-    pub size: winit::dpi::PhysicalSize<u32>,
+    size: winit::dpi::PhysicalSize<u32>,
     title: String,
     renderer: Option<Renderer>,
     current_level_builder: Option<LevelBuilder>,
@@ -84,7 +84,8 @@ impl Game {
 
     fn render(&mut self) {
         if let Some(renderer) = self.renderer.as_mut()
-        && let Some(level) = self.current_level.as_ref() {
+            && let Some(level) = self.current_level.as_ref()
+        {
             renderer.render(self.size, level);
         }
     }
@@ -137,7 +138,7 @@ impl winit::application::ApplicationHandler<GameEvent> for Game {
             _ => {}
         }
     }
-    
+
     fn user_event(&mut self, _event_loop: &winit::event_loop::ActiveEventLoop, event: GameEvent) {
         match event {
             GameEvent::Tick => {

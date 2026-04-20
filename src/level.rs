@@ -5,12 +5,12 @@ mod layer;
 #[path = "./tileset.rs"]
 mod tileset;
 
-use crate::game::{error, Game, GameError};
 use crate::game::renderer::Renderer;
+use crate::game::{Game, GameError, error};
+use camera::{Camera, CameraRenderData};
 use layer::Layer;
 use std::str::FromStr;
-use tileset::{Tileset, TilesetBuilder};
-use camera::{Camera, CameraRenderData};
+use tileset::{Tile, Tileset, TilesetBuilder};
 
 pub struct Level {
     width: u32,
@@ -18,6 +18,7 @@ pub struct Level {
     tilewidth: u32,
     tileheight: u32,
     tilesets: Vec<Tileset>,
+    tilemap: Vec<Tile>,
     layers: Vec<Layer>,
     camera: Camera,
 }
@@ -234,7 +235,9 @@ impl LevelBuilder {
                                                 property.value = attribute.value;
                                             }
                                             _ => {
-                                                return Err(GameError::LevelTmxPropertyUnhandledAttribute);
+                                                return Err(
+                                                    GameError::LevelTmxPropertyUnhandledAttribute,
+                                                );
                                             }
                                         }
                                         match property.name.as_str() {
@@ -315,6 +318,7 @@ impl LevelBuilder {
     }
 
     pub fn build(mut self, renderer: &mut Renderer) -> Level {
+        let mut tilemap = Vec::new();
         self.layers.sort_by(|l1, l2| l1.order.cmp(&l2.order));
         Level {
             width: self.width,
@@ -326,11 +330,13 @@ impl LevelBuilder {
                 .into_iter()
                 .map(|b| b.build(renderer))
                 .collect(),
+            tilemap,
             layers: self.layers,
-            camera: Camera {
-                x: self.width as f32 / 2 as f32,
-                y: self.height as f32 / 2 as f32,
-            },
+            camera: Camera::new(
+                self.width as f32 / 2 as f32,
+                self.height as f32 / 2 as f32,
+                renderer,
+            ),
         }
     }
 }
